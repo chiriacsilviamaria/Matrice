@@ -100,20 +100,22 @@ M coloane: <input type="number" id="m">
 <script>
 // helper: transformă numerele non-intregi în fracții simple
 function toFraction(x, tolerance = 1e-10) {
-    if (x === 0) return "0";
+    if(x === 0) return "0";
+    if(Number.isInteger(x)) return x; // <-- dacă e întreg, returnează direct
     let sign = x < 0 ? -1 : 1;
     x = Math.abs(x);
-    if (Number.isInteger(x)) return sign * x; // dacă e întreg, returnează direct
-    
-    // verificăm dacă e o fracție simplă
+
+    // verificăm fracții simple
     const denominators = [2,3,4,5,6,8,10,12,16,20,25,50,100];
-    for (let d of denominators) {
-        let n = Math.round(x * d);
-        if (Math.abs(x - n / d) < tolerance) {
-            return (sign * n) + "/" + d;
+    for(let d of denominators){
+        let n = Math.round(x*d);
+        if(Math.abs(x - n/d) < tolerance){
+            return (sign*n) + "/" + d;
         }
     }
-    return (sign * x).toFixed(3); // altfel zecimal, cu 3 zecimale
+
+    // altfel zecimal cu 3 zecimale
+    return (sign*x).toFixed(3);
 }
 
 function generateMatrix() {
