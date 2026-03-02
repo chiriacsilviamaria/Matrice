@@ -120,6 +120,7 @@ function generateMatrix() {
 
     if(n !== m || isNaN(n) || n <= 0) {
         document.getElementById("result").innerHTML = "Matricea trebuie să fie pătratică!";
+        document.getElementById("matrixArea").innerHTML = "";
         return;
     }
 
@@ -177,9 +178,11 @@ function checkMatrix(n){
     if(Math.abs(det) < 1e-10){
         document.getElementById("result").innerHTML =
         "Matricea NU este inversabilă<br><button onclick='location.reload()'>Încearcă din nou</button>";
+        document.getElementById("inverse").innerHTML = "";
     } else {
         document.getElementById("result").innerHTML =
         "Matricea este inversabilă<br><button onclick='generateInverse("+n+")'>Generează inversa</button>";
+        document.getElementById("inverse").innerHTML = "";
     }
 }
 
