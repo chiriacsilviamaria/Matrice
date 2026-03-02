@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cod C++ - Matrice Inversabilă</title>
+    <style>
+        body {
+            font-family: Consolas, monospace;
+            background-color: #f9f0f0;
+            padding: 30px;
+        }
+        h2 {
+            color: #b30000;
+            text-align: center;
+        }
+        pre {
+            background-color: #fff;
+            border: 2px solid #cc0000;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-x: auto;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Cod C++ pentru matrice inversabilă</h2>
+    <pre>
+#include &lt;iostream&gt;
+using namespace std;
+
+int main() 
+{
+    int n;
+    cout &lt;&lt; "Introdu dimensiunea matricei n (max 10): ";
+    cin &gt;&gt; n;
+    if(n&lt;1 || n&gt;10)
+    {
+        cout &lt;&lt; "Dimensiune nepermisa";
+        return 0;
+    }
+    double a[10][10];
+    double inv[10][10] = {0}; 
+    cout &lt;&lt; "Introdu elementele matricei:"&lt;&lt;endl;
+    for(int i=0;i&lt;n;i++)
+        for(int j=0;j&lt;n;j++)
+            cin &gt;&gt; a[i][j];
+    for(int i=0;i&lt;n;i++)
+        inv[i][i] = 1;
+    cout &lt;&lt; "Matricea este:\n";
+    for(int i=0;i&lt;n;i++)
+    {
+        for(int j=0;j&lt;n;j++)
+            cout &lt;&lt; a[i][j] &lt;&lt; " ";
+        cout &lt;&lt; endl;
+    }
+    for(int i=0;i&lt;n;i++)
+    {
+        if(a[i][i] == 0)
+        {
+            int sr = -1;
+            for(int k=i+1;k&lt;n;k++)
+            {
+                if(a[k][i] != 0)
+                {
+                    sr = k;
+                    break;
+                }
+            }
+            if(sr == -1)
+            {
+                cout &lt;&lt; "Matricea nu este inversabila."&lt;&lt;endl;
+                return 0;
+            }
+            for(int j=0;j&lt;n;j++)
+            {
+                swap(a[i][j], a[sr][j]);
+                swap(inv[i][j], inv[sr][j]);
+            }
+        }
+        double p= a[i][i];
+        for(int j=0;j&lt;n;j++){
+            a[i][j] /= p;
+            inv[i][j] /= p;
+        }
+        for(int k=0;k&lt;n;k++)
+        {
+            if(k==i) 
+                continue;
+            double factor = a[k][i];
+            for(int j=0;j&lt;n;j++)
+            {
+                a[k][j] -= factor*a[i][j];
+                inv[k][j] -= factor*inv[i][j];
+            }
+        }
+    }
+    cout &lt;&lt; "Matricea este inversabila"&lt;&lt;endl;
+    cout &lt;&lt; "Inversa matricei este:"&lt;&lt;endl;
+    for(int i=0;i&lt;n;i++)
+    {
+        for(int j=0;j&lt;n;j++)
+            cout &lt;&lt; inv[i][j] &lt;&lt; " ";
+        cout &lt;&lt; endl;
+    }
+    return 0;
+}
+    </pre>
+</body>
+</html>

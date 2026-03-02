@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Matrice Inversabilă</title>
+    <style>
+    body { 
+        font-family: 'Segoe UI', sans-serif; 
+        text-align: center; 
+        margin-top: 40px; 
+        background: linear-gradient(135deg, #ffe6e6, #fff5f5);
+    }
+
+    h2 {
+        color: #b30000;
+        font-size: 28px;
+    }
+
+    table { 
+        margin: 30px auto; 
+        border-collapse: separate;
+        border-spacing: 8px;
+    }
+
+    td { 
+        padding: 5px; 
+    }
+
+    input[type=number] { 
+        width: 70px; 
+        height: 50px;
+        text-align: center; 
+        font-size: 18px;
+        border: 2px solid #cc0000;
+        border-radius: 10px;
+        outline: none;
+        transition: 0.2s;
+        background-color: white;
+    }
+
+    input[type=number]:focus {
+        border-color: #ff3333;
+        box-shadow: 0 0 8px rgba(255,0,0,0.3);
+    }
+
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    button { 
+        padding: 10px 20px; 
+        margin: 10px; 
+        font-size: 16px;
+        border-radius: 8px;
+        border: none;
+        background-color: #cc0000;
+        color: white;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    button:hover {
+        background-color: #990000;
+        transform: scale(1.05);
+    }
+
+    #result, #inverse {
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    #inverse table td {
+        border: 2px solid #cc0000;
+        border-radius: 8px;
+        padding: 10px;
+        background-color: white;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+
+
+<button onclick="window.open('cpp_inversa.html', '_blank')">Vezi cod C++</button>
+<h2>Verificare Matrice Inversabilă</h2>
+N linii: <input type="number" id="n">
+M coloane: <input type="number" id="m">
+<button onclick="generateMatrix()">Generează</button>
+
+<div id="matrixArea"></div>
+<div id="result"></div>
+<div id="inverse"></div>
+
+<script>
+
+function generateMatrix() {
+    let n = parseInt(document.getElementById("n").value);
+    let m = parseInt(document.getElementById("m").value);
+
+    if(n !== m || isNaN(n) || n <= 0) {
+        document.getElementById("result").innerHTML = "Matricea trebuie să fie pătratică!";
+        return;
+    }
+
+    let html = "<table>";
+    for(let i=0;i<n;i++){
+        html += "<tr>";
+        for(let j=0;j<n;j++){
+            html += "<td><input type='number' id='cell-"+i+"-"+j+"'></td>";
+        }
+        html += "</tr>";
+    }
+    html += "</table>";
+    html += "<button onclick='checkMatrix("+n+")'>Verifică</button>";
+
+    document.getElementById("matrixArea").innerHTML = html;
+    document.getElementById("result").innerHTML = "";
+    document.getElementById("inverse").innerHTML = "";
+}
+
+function getMatrix(n){
+    let a=[];
+    for(let i=0;i<n;i++){
+        a[i]=[];
+        for(let j=0;j<n;j++){
+            a[i][j]=parseFloat(document.getElementById("cell-"+i+"-"+j).value)||0;
+        }
+    }
+    return a;
+}
+
+function determinant(a){
+    let n=a.length;
+    if(n==1) return a[0][0];
+    if(n==2) return a[0][0]*a[1][1]-a[0][1]*a[1][0];
+
+    let det=0;
+    for(let col=0;col<n;col++){
+        let sub=[];
+        for(let i=1;i<n;i++){
+            let row=[];
+            for(let j=0;j<n;j++){
+                if(j!=col) row.push(a[i][j]);
+            }
+            sub.push(row);
+        }
+        det += (col%2==0?1:-1)*a[0][col]*determinant(sub);
+    }
+    return det;
+}
+
+function checkMatrix(n){
+    let a=getMatrix(n);
+    let det=determinant(a);
+
+    if(det==0){
+        document.getElementById("result").innerHTML =
+        "Matricea NU este inversabilă<br><button onclick='location.reload()'>Încearcă din nou</button>";
+    } else {
+        document.getElementById("result").innerHTML =
+        "Matricea este inversabilă<br><button onclick='generateInverse("+n+")'>Generează inversa</button>";
+    }
+}
+
+function generateInverse(n){
+    let a=getMatrix(n);
+    let det=determinant(a);
+    let adj=[];
+
+    for(let i=0;i<n;i++){
+        adj[i]=[];
+        for(let j=0;j<n;j++){
+            let sub=[];
+            for(let r=0;r<n;r++){
+                if(r==i) continue;
+                let row=[];
+                for(let c=0;c<n;c++){
+                    if(c==j) continue;
+                    row.push(a[r][c]);
+                }
+                sub.push(row);
+            }
+            adj[i][j]=((i+j)%2==0?1:-1)*determinant(sub);
+        }
+    }
+
+    let inv=[];
+    for(let i=0;i<n;i++){
+        inv[i]=[];
+        for(let j=0;j<n;j++){
+            inv[i][j]= (adj[j][i]/det).toFixed(2);
+        }
+    }
+
+    let html="<h3>Inversa:</h3><table>";
+    for(let i=0;i<n;i++){
+        html+="<tr>";
+        for(let j=0;j<n;j++){
+            html+="<td>"+inv[i][j]+"</td>";
+        }
+        html+="</tr>";
+    }
+    html+="</table>";
+
+    document.getElementById("inverse").innerHTML=html;
+}
+
+</script>
+
+</body>
+</html>
