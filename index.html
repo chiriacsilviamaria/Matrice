@@ -98,6 +98,21 @@ M coloane: <input type="number" id="m">
 <div id="inverse"></div>
 
 <script>
+// helper: transformă numere reale în fracții simple
+function toFraction(x, tolerance = 1e-10) {
+    if(x === 0) return "0";
+    let sign = x < 0 ? -1 : 1;
+    x = Math.abs(x);
+    let h1=1, h2=0, k1=0, k2=1, b=x;
+    do {
+        let a = Math.floor(b);
+        let h = a*h1 + h2;
+        let k = a*k1 + k2;
+        if(Math.abs(x - h/k) < tolerance) return (sign*h)+"/"+k;
+        h2=h1; h1=h; k2=k1; k1=k;
+        b = 1/(b - a);
+    } while(true);
+}
 
 function generateMatrix() {
     let n = parseInt(document.getElementById("n").value);
@@ -112,7 +127,7 @@ function generateMatrix() {
     for(let i=0;i<n;i++){
         html += "<tr>";
         for(let j=0;j<n;j++){
-            html += "<td><input type='number' id='cell-"+i+"-"+j+"'></td>";
+            html += "<td><input type='number' step='any' id='cell-"+i+"-"+j+"'></td>";
         }
         html += "</tr>";
     }
@@ -159,7 +174,7 @@ function checkMatrix(n){
     let a=getMatrix(n);
     let det=determinant(a);
 
-    if(det==0){
+    if(Math.abs(det) < 1e-10){
         document.getElementById("result").innerHTML =
         "Matricea NU este inversabilă<br><button onclick='location.reload()'>Încearcă din nou</button>";
     } else {
@@ -190,15 +205,16 @@ function generateInverse(n){
         }
     }
 
+    // transpunere
     let inv=[];
     for(let i=0;i<n;i++){
         inv[i]=[];
         for(let j=0;j<n;j++){
-            inv[i][j]= (adj[j][i]/det).toFixed(2);
+            inv[i][j]=toFraction(adj[j][i]/det);
         }
     }
 
-    let html="<h3>Inversa:</h3><table>";
+    let html="<h3>Inversa (fracții):</h3><table>";
     for(let i=0;i<n;i++){
         html+="<tr>";
         for(let j=0;j<n;j++){
@@ -210,7 +226,6 @@ function generateInverse(n){
 
     document.getElementById("inverse").innerHTML=html;
 }
-
 </script>
 
 </body>
