@@ -98,20 +98,22 @@ M coloane: <input type="number" id="m">
 <div id="inverse"></div>
 
 <script>
-// helper: transformă numere reale în fracții simple
+// helper: transformă numerele non-intregi în fracții simple
 function toFraction(x, tolerance = 1e-10) {
-    if(x === 0) return "0";
+    if (x === 0) return "0";
     let sign = x < 0 ? -1 : 1;
     x = Math.abs(x);
-    let h1=1, h2=0, k1=0, k2=1, b=x;
-    do {
-        let a = Math.floor(b);
-        let h = a*h1 + h2;
-        let k = a*k1 + k2;
-        if(Math.abs(x - h/k) < tolerance) return (sign*h)+"/"+k;
-        h2=h1; h1=h; k2=k1; k1=k;
-        b = 1/(b - a);
-    } while(true);
+    if (Number.isInteger(x)) return sign * x; // dacă e întreg, returnează direct
+    
+    // verificăm dacă e o fracție simplă
+    const denominators = [2,3,4,5,6,8,10,12,16,20,25,50,100];
+    for (let d of denominators) {
+        let n = Math.round(x * d);
+        if (Math.abs(x - n / d) < tolerance) {
+            return (sign * n) + "/" + d;
+        }
+    }
+    return (sign * x).toFixed(3); // altfel zecimal, cu 3 zecimale
 }
 
 function generateMatrix() {
@@ -213,11 +215,11 @@ function generateInverse(n){
     for(let i=0;i<n;i++){
         inv[i]=[];
         for(let j=0;j<n;j++){
-            inv[i][j]=toFraction(adj[j][i]/det);
+            inv[i][j]=toFraction(adj[j][i]/det); // folosim toFraction doar pentru afișare
         }
     }
 
-    let html="<h3>Inversa (fracții):</h3><table>";
+    let html="<h3>Inversa (fracții pentru non-intregi):</h3><table>";
     for(let i=0;i<n;i++){
         html+="<tr>";
         for(let j=0;j<n;j++){
